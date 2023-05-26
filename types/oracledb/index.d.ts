@@ -2190,6 +2190,36 @@ declare namespace OracleDB {
          * Statistics can be output to the console by calling the pool.logStatistics() method.
          */
         enableStatistics?: boolean | undefined;
+        /**
+         * For Microsoft Azure Active Directory OAuth 2.0 token-based authentication accessToken can be:
+         * a callback function returning the token as a string
+         * an object with a token attribute containing the token as a string
+         * or the token as a string
+         * Tokens can be obtained using various approaches. For example, using the Azure Active Directory API.
+         * For Oracle Cloud Infrastructure Identity and Access Management (IAM) token-based authentication accessToken can be:
+         * a callback function returning an object containing token and privateKey attributes
+         * or an object containing token and privateKey attributes
+         * The properties of the accessToken object are described in createPool(): accessToken Object Attributes.
+         * If the accessToken is a callback function:
+         * function accessToken(boolean refresh)
+         * When accessToken is a callback function, it will be invoked at the time the pool is created (even if poolMin is 0). It is also called when the pool needs to expand (causing new connections to be created) and the current token has expired. The returned token is used by node-oracledb for authentication. The refresh parameter is described in createPool(): refresh Parameter Values.
+         * When the callback is first invoked, the refresh parameter will be set to false. This indicates that the application can provide a token from its own application managed cache, or it can generate a new token if there is no cached value. Node-oracledb checks whether the returned token has expired. If it has expired, then the callback function will be invoked a second time with refresh set to true. In this case the function must externally acquire a token, optionally add it to the application’s cache, and return the token.
+         * For token-based authentication, the externalAuth and homogeneous pool attributes must be set to true. The user (or username) and password attributes should not be set.
+         * See Token-Based Authentication for more information.
+         * New in version 5.4.
+         * This attribute was added to support IAM token-based authentication. In this release the attribute must be an Object. For node-oracledb Thick mode, Oracle Client libraries 19.14 (or later), or 21.5 (or later) must be used for IAM token-based authentication.
+         * The accessToken attribute was extended to allow OAuth 2.0 token-based authentication in node-oracledb 5.5. For OAuth 2.0, the attribute should be a string, or a callback. For node-oracledb Thick mode, Oracle Client libraries 19.15 (or later), or 21.7 (or later) must be used. The callback usage supports both OAuth 2.0 and IAM token-based authentication.
+         */
+        accessToken?: string | ((refresh: boolean) => string | { token: string, privateKey: string} | (() => { token: string, privateKey: string})) | undefined;
+        /**
+         * This optional attribute is a Node.js callback function. It gets called by the connection pool if the pool needs to grow and create new connections but the current token has expired.
+         * The callback function must return a JavaScript object with attributes token and privateKey for IAM. See Connection Pool Creation with Access Tokens for IAM.
+         * New in version 5.4.It should be used with Oracle Client libraries 19.14 (or later), or 21.5 (or later).
+         * Deprecated since version 5.5.
+         * Desupported in version 6.0.
+         * Use accessToken instead, which was enhanced to support a callback.
+         */
+        accessTokenCallback?: (() => { token: string, privateKey: string}) | undefined;
     }
 
     /**
